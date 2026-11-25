@@ -5,80 +5,79 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>synreplace</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=2" />
 </head>
 <body>
   <header class="masthead">
-    <div class="masthead-row">
-      <div class="brand">
-        <p class="wordmark">synreplace</p>
-        <p class="tagline">Replace every N-th word with its closest synonym.</p>
-      </div>
-      <div class="masthead-actions">
-        <button id="sample-btn" type="button" class="key key-lg">Sample text</button>
-        <button id="help-btn" type="button" class="key key-lg help-btn" aria-haspopup="dialog" aria-expanded="false">?</button>
-      </div>
-    </div>
+    <h1 class="wordmark">synreplace</h1>
+    <!-- The blank mirrors the Every field (app.js, updateTagline()), so the
+         line always says what Strike is about to do. -->
+    <p class="tagline">Replace every <span class="blank" id="tagline-every">5th</span> word with its closest synonym.</p>
   </header>
 
   <main>
     <div class="strip" id="control-strip">
-      <div class="strip-seg">
-        <label class="tiny" for="every">Every</label>
-        <input type="number" id="every" min="1" value="5" class="strip-input" />
-      </div>
-      <div class="strip-seg">
-        <label class="tiny" for="senses">Senses</label>
-        <input type="number" id="senses" min="1" value="3" class="strip-input" />
-      </div>
-      <div class="strip-seg strip-seg-wide">
-        <label class="tiny" for="threshold">Threshold <span id="threshold-value" class="value-tag">0.95</span></label>
-        <input type="range" id="threshold" min="0" max="1" step="0.01" value="0.95" />
-      </div>
-      <div class="strip-seg strip-seg-check">
-        <button type="button" class="check-toggle" id="slide-toggle" aria-pressed="false">
-          <span class="box" aria-hidden="true"></span> Slide
-        </button>
-      </div>
-      <div class="strip-seg strip-seg-check">
-        <button type="button" class="check-toggle" id="multiword-toggle" aria-pressed="false">
-          <span class="box" aria-hidden="true"></span> Multi&#8209;word
-        </button>
-      </div>
-      <div class="strip-seg strip-seg-sources">
-        <button type="button" class="sources-btn" id="sources-btn" aria-expanded="false" aria-haspopup="true">
-          <span class="tiny">Sources</span>
-          <span id="sources-summary">wordnet</span>
-        </button>
-        <div class="sources-panel" id="sources-panel" hidden>
-          <label class="source-row">
-            <input type="checkbox" class="source-checkbox" value="wordnet" checked />
-            WordNet <span class="tag">offline</span>
-          </label>
-          <label class="source-row">
-            <input type="checkbox" class="source-checkbox" value="datamuse" />
-            Datamuse <span class="tag online">online</span>
-          </label>
-          <p class="sources-hint">Checked sources are pooled together. Every
-            field above applies to all of them &mdash; see
-            <a href="/docs" target="_blank" rel="noopener">the API docs</a>
-            for what each means per source.</p>
+      <div class="strip-settings">
+        <div class="strip-seg">
+          <label class="tiny" for="every">Every</label>
+          <input type="number" id="every" min="1" value="5" class="strip-input" />
+        </div>
+        <div class="strip-seg">
+          <label class="tiny" for="senses">Senses</label>
+          <input type="number" id="senses" min="1" value="3" class="strip-input" />
+        </div>
+        <div class="strip-seg strip-seg-wide">
+          <label class="tiny" for="threshold">Threshold <span id="threshold-value" class="value-tag">0.95</span></label>
+          <input type="range" id="threshold" min="0" max="1" step="0.01" value="0.95" />
+        </div>
+        <div class="strip-seg strip-seg-check">
+          <button type="button" class="check-toggle" id="slide-toggle" aria-pressed="false">
+            <span class="box" aria-hidden="true"></span> Slide
+          </button>
+        </div>
+        <div class="strip-seg strip-seg-check">
+          <button type="button" class="check-toggle" id="multiword-toggle" aria-pressed="false">
+            <span class="box" aria-hidden="true"></span> Multi&#8209;word
+          </button>
+        </div>
+        <div class="strip-seg strip-seg-sources">
+          <button type="button" class="sources-btn" id="sources-btn" aria-expanded="false" aria-haspopup="true">
+            <span class="tiny">Sources</span>
+            <span id="sources-summary">wordnet</span>
+          </button>
+          <div class="sources-panel" id="sources-panel" hidden>
+            <label class="source-row">
+              <input type="checkbox" class="source-checkbox" value="wordnet" checked />
+              WordNet <span class="tag">offline</span>
+            </label>
+            <label class="source-row">
+              <input type="checkbox" class="source-checkbox" value="datamuse" />
+              Datamuse <span class="tag online">online</span>
+            </label>
+            <p class="sources-hint">Checked sources are pooled together. Every
+              field above applies to all of them &mdash; see
+              <a href="/docs" target="_blank" rel="noopener">the API docs</a>
+              for what each means per source.</p>
+          </div>
         </div>
       </div>
 
-      <div class="strip-fill"></div>
-
-      <div class="strip-seg strip-seg-keys">
-        <span class="tiny">Ribbon</span>
-        <div class="keys" id="ribbon-keys" role="radiogroup" aria-label="Result view">
-          <button type="button" class="key active" data-mode="black" role="radio" aria-checked="true">Black</button>
-          <button type="button" class="key" data-mode="blackred" role="radio" aria-checked="false">Blk+Red</button>
-          <button type="button" class="key" data-mode="duplicate" role="radio" aria-checked="false">Dupl.</button>
+      <div class="strip-actions">
+        <div class="strip-seg strip-seg-keys">
+          <span class="tiny">Ribbon</span>
+          <div class="keys" id="ribbon-keys" role="radiogroup" aria-label="Result view">
+            <button type="button" class="key active" data-mode="black" role="radio" aria-checked="true">Black</button>
+            <button type="button" class="key" data-mode="blackred" role="radio" aria-checked="false">Blk+Red</button>
+            <button type="button" class="key" data-mode="duplicate" role="radio" aria-checked="false">Dupl.</button>
+          </div>
+        </div>
+        <div class="strip-go">
+          <button id="help-btn" type="button" class="key help-btn" aria-haspopup="dialog" aria-expanded="false" aria-label="Field guide" title="Field guide">?</button>
+          <button id="rewrite-btn" type="button" class="stamp-btn">
+            <span id="rewrite-label">Strike</span>
+          </button>
         </div>
       </div>
-      <button id="rewrite-btn" type="button" class="stamp-btn">
-        <span id="rewrite-label">Strike</span>
-      </button>
     </div>
     <div class="strip-status">
       <span id="status" role="status" aria-live="polite"></span>
@@ -90,7 +89,10 @@
     <section class="page-frame">
       <div class="page-input-head">
         <label class="tiny" for="text">Page</label>
-        <span class="word-count" id="word-count">0 words</span>
+        <div class="page-head-right">
+          <span class="word-count" id="word-count">0 words</span>
+          <button id="sample-btn" type="button" class="key">Sample text</button>
+        </div>
       </div>
       <textarea id="text" class="page-input" rows="12" placeholder="Paste or type your text here&hellip;"></textarea>
 
@@ -206,6 +208,6 @@
     </div>
   </div>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=2"></script>
 </body>
 </html>

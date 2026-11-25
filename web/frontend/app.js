@@ -743,4 +743,23 @@ els.threshold.addEventListener("input", () => {
   els.thresholdValue.textContent = Number(els.threshold.value).toFixed(2);
 });
 
+// Keeps the masthead's "Replace every ___ word" blank in step with the
+// Every field. An empty or invalid field falls back to 5, matching the
+// default rewrite() sends.
+function updateTagline() {
+  const n = Math.floor(Number(els.every.value)) || 5;
+  let label;
+  if (n <= 1) {
+    label = "single";
+  } else {
+    const lastTwo = n % 100;
+    const suffix = lastTwo >= 11 && lastTwo <= 13 ? "th"
+      : ({ 1: "st", 2: "nd", 3: "rd" }[n % 10] || "th");
+    label = n + suffix;
+  }
+  document.getElementById("tagline-every").textContent = label;
+}
+els.every.addEventListener("input", updateTagline);
+
 updateWordCount();
+updateTagline();
