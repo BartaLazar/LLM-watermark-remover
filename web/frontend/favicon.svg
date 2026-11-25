@@ -1,6 +1,65 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <!-- Typewriter key: ribbon-red square with a struck-through "s", matching the UI's palette. -->
-  <rect width="32" height="32" rx="6" fill="#b3372c"/>
-  <text x="16" y="23" text-anchor="middle" font-family="'Courier New', Courier, monospace" font-size="24" font-weight="700" fill="#f6f5ef">s</text>
-  <line x1="7" y1="16.5" x2="25" y2="16.5" stroke="#f6f5ef" stroke-width="2.2" stroke-linecap="round"/>
+  <!-- A small enamel typewriter in the UI's materials: a typed sheet in the
+       black roller with chrome knobs, a sage body with glass keys, one red
+       key (Strike) and a chrome space bar. Big simple shapes first, so it
+       still reads at 16px. -->
+  <defs>
+    <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#e9e2cf"/>
+    </linearGradient>
+    <linearGradient id="roller" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5c5c56"/>
+      <stop offset="0.45" stop-color="#141413"/>
+      <stop offset="1" stop-color="#2e2e2b"/>
+    </linearGradient>
+    <linearGradient id="chrome" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6a6c66"/>
+      <stop offset="0.3" stop-color="#fbfbf9"/>
+      <stop offset="0.6" stop-color="#b9bbb5"/>
+      <stop offset="1" stop-color="#55574f"/>
+    </linearGradient>
+    <linearGradient id="enamel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c6d3be"/>
+      <stop offset="0.5" stop-color="#a3b29b"/>
+      <stop offset="1" stop-color="#7a8973"/>
+    </linearGradient>
+    <radialGradient id="key" cx="0.5" cy="0.3" r="0.7">
+      <stop offset="0" stop-color="#6a6a63"/>
+      <stop offset="1" stop-color="#121211"/>
+    </radialGradient>
+    <radialGradient id="red" cx="0.5" cy="0.3" r="0.7">
+      <stop offset="0" stop-color="#f07a6c"/>
+      <stop offset="1" stop-color="#9c1f18"/>
+    </radialGradient>
+  </defs>
+
+  <!-- the sheet, with two typed lines -->
+  <rect x="8.5" y="1.5" width="15" height="11" rx="0.8" fill="url(#paper)" stroke="#a39c88" stroke-width="0.5"/>
+  <path d="M11 4.6h10M11 7.2h7" stroke="#4b4840" stroke-width="1" stroke-linecap="round"/>
+
+  <!-- roller and knobs -->
+  <rect x="1.2" y="9.6" width="2.6" height="5.4" rx="0.8" fill="url(#chrome)" stroke="#3d3f39" stroke-width="0.35"/>
+  <rect x="28.2" y="9.6" width="2.6" height="5.4" rx="0.8" fill="url(#chrome)" stroke="#3d3f39" stroke-width="0.35"/>
+  <rect x="3.6" y="10.1" width="24.8" height="4.4" rx="2.2" fill="url(#roller)"/>
+
+  <!-- body -->
+  <path d="M5.2 15.2h21.6l3.3 11.9a2.2 2.2 0 0 1-2.1 2.8H4a2.2 2.2 0 0 1-2.1-2.8z" fill="url(#enamel)" stroke="#4a5744" stroke-width="0.6"/>
+  <path d="M6 16.2h20" stroke="#ffffff" stroke-opacity="0.55" stroke-width="0.6" stroke-linecap="round"/>
+
+  <!-- keys -->
+  <g fill="url(#key)" stroke="#d9dad5" stroke-width="0.45">
+    <circle cx="8.6" cy="19.8" r="1.35"/>
+    <circle cx="12.8" cy="19.8" r="1.35"/>
+    <circle cx="17" cy="19.8" r="1.35"/>
+    <circle cx="21.2" cy="19.8" r="1.35"/>
+    <circle cx="6.8" cy="23.6" r="1.35"/>
+    <circle cx="11" cy="23.6" r="1.35"/>
+    <circle cx="15.2" cy="23.6" r="1.35"/>
+    <circle cx="19.4" cy="23.6" r="1.35"/>
+  </g>
+  <circle cx="24.6" cy="21.7" r="2" fill="url(#red)" stroke="#6a130e" stroke-width="0.45"/>
+
+  <!-- space bar -->
+  <rect x="9" y="26.6" width="14" height="1.7" rx="0.85" fill="url(#chrome)" stroke="#3d3f39" stroke-width="0.3"/>
 </svg>

@@ -80,7 +80,8 @@ web/
 ├── frontend/
 │   ├── index.html
 │   ├── style.css
-│   └── app.js            # Calls the REST API via fetch()
+│   ├── app.js            # Calls the REST API via fetch()
+│   └── textures/         # SVG noise tiles for the wood and paper
 ├── docs/
 │   └── API.md             # Full API reference
 └── README.md               # This file

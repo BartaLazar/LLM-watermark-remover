@@ -281,8 +281,9 @@ A few things it adds on top of the CLI:
   button back to the original word, plus up to 3 alternative-synonym chips to
   swap in instead; every view updates immediately, no re-run needed.
 - **Jump between a word and its card, either way.** Click a card to highlight
-  its word in the page; in Blk+Red or Dupl., click a red word to jump back to
-  its card. Either one leaves a real inverted-color box in place for 5s.
+  its word in the page with an inverted-color box; in Blk+Red or Dupl., click
+  a red word to jump back to its card, which gets a red outline. Either
+  highlight stays in place for 5s.
 - **A loading indicator** while a request is in flight (the online sources
   can take a few seconds), and a **?** field guide with a one-line
   explanation of every control.
