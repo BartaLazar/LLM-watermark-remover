@@ -26,12 +26,17 @@ aws cloudformation describe-stacks \
 ```
 
 Copy the two outputs into GitHub, under **Settings → Secrets and variables →
-Actions → Variables** (repository variables, not secrets: they are identifiers):
+Actions → Secrets → New repository secret**:
 
-| Variable | Output |
+| Secret | Output |
 |---|---|
 | `AWS_DEPLOY_ROLE_ARN` | `DeployRoleArn` |
 | `ECR_REPOSITORY_URI` | `ImageRepositoryUri` |
+
+Both contain the AWS account ID. They are stored as secrets, not variables,
+because this repository is public and so are its Actions logs: GitHub masks
+secrets as `***` in logs, but prints variables in plain text. Never paste the
+outputs into a tracked file.
 
 ## Tearing everything down
 

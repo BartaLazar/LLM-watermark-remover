@@ -201,10 +201,10 @@ Resources:
 
 Outputs:
   DeployRoleArn:
-    Description: Put in GitHub as repository variable AWS_DEPLOY_ROLE_ARN.
+    Description: Store in GitHub as repository secret AWS_DEPLOY_ROLE_ARN (contains the account ID).
     Value: !GetAtt GitHubDeployRole.Arn
   ImageRepositoryUri:
-    Description: Put in GitHub as repository variable ECR_REPOSITORY_URI.
+    Description: Store in GitHub as repository secret ECR_REPOSITORY_URI (contains the account ID).
     Value: !GetAtt ImageRepository.RepositoryUri
   LambdaExecutionRoleArn:
     Description: Runtime role, read by the app stack.
