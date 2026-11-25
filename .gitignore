@@ -11,3 +11,4 @@ nltk_data/
 .claude/
 work_text_files/
 tests/test_extra_cases.py
+.playwright-mcp/
