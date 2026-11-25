@@ -33,7 +33,7 @@ from .synonyms import BLOCKED, TAG_MAP, Inflector, eligible_lemma
 # would just look unreplaceable. Comes at the cost of a genuinely dead/
 # unreachable API stalling each lookup for the full timeout before giving up.
 REQUEST_TIMEOUT = 10.0  # seconds
-USER_AGENT = "synreplace (https://github.com/BartaLazar/LLM-waternark-remover)"
+USER_AGENT = "synreplace (https://github.com/BartaLazar/LLM-watermark-remover)"
 
 
 def _get_json(url: str):
