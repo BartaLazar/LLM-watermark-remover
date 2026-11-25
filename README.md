@@ -24,6 +24,10 @@ The same rewrite, from the browser UI:
 
 ![synreplace web interface showing a short example rewritten in the Blk+Red view, with its corrections cards below](docs/web-ui-short.png)
 
+**Try it online, no install needed:**
+<https://wgmeloml2r62ylbjcoi575zd2u0glygi.lambda-url.eu-north-1.on.aws/>
+(the first request after a quiet spell takes a few seconds while the server wakes up).
+
 ## Contents
 
 - [Features](#features)
@@ -254,6 +258,13 @@ A browser UI and REST API also exist, in [`web/`](web/), a separate,
 self-contained folder with its own setup and its own server, independent of
 this CLI. See [`web/README.md`](web/README.md) to run it, and
 [`web/docs/API.md`](web/docs/API.md) for the REST API reference.
+
+A hosted copy runs at
+<https://wgmeloml2r62ylbjcoi575zd2u0glygi.lambda-url.eu-north-1.on.aws/>
+(interactive API docs at
+[`/docs`](https://wgmeloml2r62ylbjcoi575zd2u0glygi.lambda-url.eu-north-1.on.aws/docs)).
+It runs on AWS Lambda and is redeployed automatically on every merge to `main`;
+see [`infra/README.md`](infra/README.md).
 
 ![synreplace web interface, showing the controls, and a rewritten result in the side-by-side Duplicate view with corrections marked in the gutter](docs/web-ui.png)
 

@@ -4,6 +4,9 @@ A browser UI and REST API for `synreplace`, kept in this folder so its code
 runs independently of the CLI: this is a separate app that happens to reuse
 the same `synreplace` engine, not a dependency of the CLI itself.
 
+**Live:** <https://wgmeloml2r62ylbjcoi575zd2u0glygi.lambda-url.eu-north-1.on.aws/>
+(deployed to AWS Lambda from `main`; see [`../infra/README.md`](../infra/README.md)).
+
 It shares the **one virtual environment at the repo root** with the CLI
 (see the top-level [`README.md`](../README.md)) rather than keeping its own:
 one `.venv`, one `requirements.txt`, for the whole project.
