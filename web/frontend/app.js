@@ -102,6 +102,60 @@ function setBusy(isBusy) {
   els.rewriteBtn.disabled = isBusy;
   els.rewriteLabel.textContent = isBusy ? "Striking…" : "Strike";
   els.loadingBar.hidden = !isBusy;
+  // Turns the roller (body.is-busy .platen in style.css) while waiting.
+  document.body.classList.toggle("is-busy", isBusy);
+}
+
+const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+// Restarts a one-shot CSS animation class on `el` and removes it once it has
+// played, so the next trigger can replay it. animationend bubbles, so events
+// from animated children (e.g. the words inside the result) are ignored.
+function playOnce(el, className) {
+  el.classList.remove(className);
+  void el.offsetWidth;
+  el.classList.add(className);
+  const onEnd = (event) => {
+    if (event.target !== el) return;
+    el.classList.remove(className);
+    el.removeEventListener("animationend", onEnd);
+  };
+  el.addEventListener("animationend", onEnd);
+}
+
+// The Strike key's blow: the machine body jolts (.jolt in style.css).
+function joltMachine() {
+  if (prefersReducedMotion.matches) return;
+  playOnce(document.getElementById("control-strip"), "jolt");
+}
+
+// After a fresh Strike, each replaced word lands on the page like a typebar
+// hitting paper (.strike-in in style.css), one after another in reading
+// order, starting once the paper has fed out. Only the visible view is
+// animated (a hidden view would hold its animation until shown), and never
+// on a Reset/alternative edit -- this runs from renderResult() only. The
+// spacing between words shrinks for long results so the whole run stays
+// under ~1.6s.
+function strikeInReplacements() {
+  if (prefersReducedMotion.matches || correctionPositions.size === 0) return;
+  const selector = {
+    black: "#view-black .result-word",
+    blackred: "#view-blackred .result-word",
+    duplicate: "#view-duplicate .gcell-set .result-word",
+  }[currentMode];
+  const order = [...correctionPositions].sort((a, b) => a - b);
+  const rank = new Map(order.map((position, i) => [String(position), i]));
+  const step = Math.min(70, 1250 / order.length);
+  for (const span of els.pageResult.querySelectorAll(selector)) {
+    const i = rank.get(span.dataset.position);
+    if (i === undefined) continue;
+    span.style.animationDelay = Math.round(380 + i * step) + "ms";
+    span.classList.add("strike-in");
+    span.addEventListener("animationend", () => {
+      span.classList.remove("strike-in");
+      span.style.animationDelay = "";
+    }, { once: true });
+  }
 }
 
 function showError(message) {
@@ -435,6 +489,8 @@ function jumpToCard(position) {
 
 function renderResult(data) {
   els.pageResult.hidden = false;
+  // Replay the paper-feed animation (.feeding in style.css) on every Strike.
+  if (!prefersReducedMotion.matches) playOnce(els.pageResult, "feeding");
   els.correctionsPanel.hidden = false;
   currentTokens = data.tokens.map((t) => ({ ...t }));
   correctionPositions = new Set(data.replacements.map((r) => r.position));
@@ -451,6 +507,7 @@ function renderResult(data) {
   clearWordHighlight();
   clearCardHighlight();
   renderAllViews();
+  strikeInReplacements();
 
   els.correctionsHeading.textContent =
     data.substitution_count + " correction" + (data.substitution_count === 1 ? "" : "s");
@@ -628,9 +685,11 @@ for (const key of els.ribbonKeys) {
 // ============================= rewrite =============================
 
 async function rewrite() {
+  joltMachine();
   const text = els.text.value;
   if (!text.trim()) {
-    showError("Enter some text first.");
+    showError("The page is empty. Type or paste some text, then press Strike.");
+    els.text.focus();
     return;
   }
   const sources = checkedSources();

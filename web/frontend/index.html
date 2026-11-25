@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>synreplace</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="style.css?v=3" />
+  <link rel="stylesheet" href="style.css?v=8" />
 </head>
 <body>
   <header class="masthead">
@@ -71,6 +71,14 @@
             <button type="button" class="key" data-mode="duplicate" role="radio" aria-checked="false">Dupl.</button>
           </div>
         </div>
+        <!-- The machine's little display: status messages and the progress
+             groove live in the body, next to the key that triggers them. -->
+        <div class="strip-meter">
+          <span id="status" class="strip-status" role="status" aria-live="polite"></span>
+          <div class="loading-bar" id="loading-bar" hidden>
+            <div class="loading-bar-fill"></div>
+          </div>
+        </div>
         <div class="strip-go">
           <button id="help-btn" type="button" class="key help-btn" aria-haspopup="dialog" aria-expanded="false" aria-label="Field guide" title="Field guide">?</button>
           <button id="rewrite-btn" type="button" class="stamp-btn">
@@ -79,14 +87,18 @@
         </div>
       </div>
     </div>
-    <div class="strip-status">
-      <span id="status" role="status" aria-live="polite"></span>
-    </div>
-    <div class="loading-bar" id="loading-bar" hidden>
-      <div class="loading-bar-fill"></div>
-    </div>
+
+    <!-- Right under the machine, so a problem shows where you just pressed
+         Strike rather than below the page, off-screen. -->
+    <section class="error" id="error-panel" role="alert" hidden>
+      <p id="error-message"></p>
+    </section>
 
     <section class="page-frame">
+      <div class="platen" aria-hidden="true">
+        <span class="platen-knob platen-knob-left"></span>
+        <span class="platen-knob platen-knob-right"></span>
+      </div>
       <div class="page-input-head">
         <label class="tiny" for="text">Page</label>
         <div class="page-head-right">
@@ -122,10 +134,6 @@
     <section class="corrections" id="corrections-panel" hidden>
       <h2 id="corrections-heading"></h2>
       <div class="cards-row" id="cards-row"></div>
-    </section>
-
-    <section class="error" id="error-panel" hidden>
-      <p id="error-message"></p>
     </section>
   </main>
 
@@ -208,6 +216,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=3"></script>
+  <script src="app.js?v=8"></script>
 </body>
 </html>
