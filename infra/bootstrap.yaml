@@ -171,22 +171,21 @@ Resources:
               - Sid: ManageTheFunction
                 Effect: Allow
                 Action:
+                  # Read anything about this one function: CloudFormation reads
+                  # more settings (code signing, runtime config, ...) than it changes.
+                  - lambda:Get*
+                  - lambda:ListTags
                   - lambda:CreateFunction
                   - lambda:UpdateFunctionCode
                   - lambda:UpdateFunctionConfiguration
-                  - lambda:GetFunction
-                  - lambda:GetFunctionConfiguration
                   - lambda:DeleteFunction
                   - lambda:TagResource
                   - lambda:UntagResource
-                  - lambda:ListTags
                   - lambda:CreateFunctionUrlConfig
                   - lambda:UpdateFunctionUrlConfig
-                  - lambda:GetFunctionUrlConfig
                   - lambda:DeleteFunctionUrlConfig
                   - lambda:AddPermission
                   - lambda:RemovePermission
-                  - lambda:GetPolicy
                   - lambda:PutFunctionConcurrency
                   - lambda:DeleteFunctionConcurrency
                 Resource: !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${AppName}

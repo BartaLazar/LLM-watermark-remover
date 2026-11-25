@@ -1,0 +1,68 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  The synreplace web app on Lambda, behind a public Function URL. Deployed by
+  GitHub Actions on every push to main (.github/workflows/deploy.yml); needs the
+  bootstrap stack (infra/bootstrap.yaml) to exist first.
+
+Parameters:
+  ImageUri:
+    Type: String
+    Description: Full ECR image reference to run, e.g. <registry>/synreplace-web:<git sha>.
+  AppName:
+    Type: String
+    Default: synreplace-web
+    Description: Must match AppName in the bootstrap stack.
+  BootstrapStackName:
+    Type: String
+    Default: synreplace-bootstrap
+
+Resources:
+  Function:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Ref AppName
+      Description: synreplace web UI + REST API (FastAPI via Lambda Web Adapter).
+      PackageType: Image
+      Code:
+        ImageUri: !Ref ImageUri
+      Role:
+        Fn::ImportValue: !Sub ${BootstrapStackName}-LambdaExecutionRoleArn
+      Architectures:
+        - x86_64
+      # Measured locally: ~215 MB used; more memory also means more CPU,
+      # so shorter cold starts.
+      MemorySize: 1024
+      # The first rewrite after a cold start loads WordNet (~5 s).
+      Timeout: 30
+      # At most 5 copies at once: caps the bill if the public URL gets spammed.
+      ReservedConcurrentExecutions: 5
+
+  # Public HTTPS address of the site. No AWS login needed to open it.
+  FunctionUrl:
+    Type: AWS::Lambda::Url
+    Properties:
+      TargetFunctionArn: !GetAtt Function.Arn
+      AuthType: NONE
+
+  # A public Function URL needs both permissions: calling the URL, and the
+  # function being invoked through it (and only through it).
+  PublicUrlInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref Function
+      Action: lambda:InvokeFunctionUrl
+      Principal: "*"
+      FunctionUrlAuthType: NONE
+
+  PublicInvokeViaUrlPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref Function
+      Action: lambda:InvokeFunction
+      Principal: "*"
+      InvokedViaFunctionUrl: true
+
+Outputs:
+  FunctionUrl:
+    Description: The live site.
+    Value: !GetAtt FunctionUrl.FunctionUrl
