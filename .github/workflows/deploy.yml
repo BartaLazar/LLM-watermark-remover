@@ -1,0 +1,109 @@
+# Pull requests: run the tests and check the image still builds (no AWS access).
+# Push to main: the same, then build the image, push it to ECR, deploy the
+# Lambda (infra/app.yaml) and smoke-test the live site.
+#
+# Needs the bootstrap stack (infra/bootstrap.yaml) and two repository secrets:
+# AWS_DEPLOY_ROLE_ARN and ECR_REPOSITORY_URI. They are secrets, not variables,
+# because this repository is public and so are its Actions logs.
+
+name: CI/CD
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  AWS_REGION: eu-north-1
+  APP_STACK: synreplace-app
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: pip install -e . -r requirements.txt
+      - name: Unit tests
+        run: python -m unittest discover -s tests -v
+      - name: Image builds
+        run: docker build -t synreplace-web .
+
+  deploy:
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    # One deploy at a time; a newer push waits instead of racing the older one.
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      id-token: write # lets the job request a GitHub OIDC token for AWS
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Log in to AWS (OIDC, no stored keys)
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+          mask-aws-account-id: true
+
+      - name: Log in to ECR
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          mask-password: true
+
+      - name: Build and push image
+        env:
+          REPOSITORY_URI: ${{ secrets.ECR_REPOSITORY_URI }}
+          TAG: ${{ github.sha }}
+        run: |
+          # Tags are immutable in ECR: on a re-run of the same commit, reuse the image.
+          if aws ecr describe-images --repository-name "${REPOSITORY_URI#*/}" \
+               --image-ids imageTag="$TAG" >/dev/null 2>&1; then
+            echo "Image for $TAG already in ECR, skipping build."
+          else
+            docker build -t "$REPOSITORY_URI:$TAG" .
+            docker push --quiet "$REPOSITORY_URI:$TAG"
+          fi
+
+      - name: Deploy Lambda
+        env:
+          REPOSITORY_URI: ${{ secrets.ECR_REPOSITORY_URI }}
+          TAG: ${{ github.sha }}
+        run: |
+          aws cloudformation deploy \
+            --stack-name "$APP_STACK" \
+            --template-file infra/app.yaml \
+            --parameter-overrides ImageUri="$REPOSITORY_URI:$TAG" \
+            --no-fail-on-empty-changeset
+
+      - name: Smoke test the live site
+        run: |
+          URL=$(aws cloudformation describe-stacks --stack-name "$APP_STACK" \
+                  --query "Stacks[0].Outputs[?OutputKey=='FunctionUrl'].OutputValue" \
+                  --output text)
+          echo "Live site: $URL"
+          echo "### Live site: $URL" >> "$GITHUB_STEP_SUMMARY"
+
+          # First call may hit a cold start, so allow retries and a long timeout.
+          curl --fail --silent --show-error --retry 5 --retry-all-errors --max-time 60 \
+               "${URL}api/v1/health"
+          echo
+
+          RESULT=$(curl --fail --silent --show-error --retry 3 --retry-all-errors --max-time 60 \
+                     -X POST "${URL}api/v1/rewrite" -H 'Content-Type: application/json' \
+                     -d '{"text":"The quick brown fox jumps over the lazy dog while the researchers carefully examined the surprising results of their difficult experiment.","every":3,"slide":true}')
+          echo "$RESULT" | python3 -c 'import json,sys; print(json.load(sys.stdin)["result"])'
+          echo "$RESULT" | grep -q 'The speedy brown fox leaps over the lazy dog' \
+            || { echo "::error::Rewrite output changed: expected the README fox example"; exit 1; }
