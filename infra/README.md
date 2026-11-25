@@ -25,6 +25,11 @@ aws cloudformation describe-stacks \
   --query "Stacks[0].Outputs" --output table
 ```
 
+**Updating the stack later:** run the same `deploy` command again. Parameter
+defaults only apply when the stack is first created; on updates it keeps each
+parameter's previous value. To change one, pass it explicitly, e.g.
+`--parameter-overrides GitHubRepo=owner@id/repo@id`.
+
 Copy the two outputs into GitHub, under **Settings → Secrets and variables →
 Actions → Secrets → New repository secret**:
 

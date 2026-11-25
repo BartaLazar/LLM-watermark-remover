@@ -8,8 +8,13 @@ Description: >
 Parameters:
   GitHubRepo:
     Type: String
-    Default: BartaLazar/LLM-watermark-remover
-    Description: owner/name of the only GitHub repo allowed to deploy.
+    # GitHub's "immutable subject" format: owner and repo name, each with its
+    # numeric ID (public: `gh api repos/OWNER/REPO -q .id`). A repo deleted and
+    # recreated under the same name gets a new ID, so it can't deploy here.
+    # Check the current format with:
+    #   gh api repos/OWNER/REPO/actions/oidc/customization/sub
+    Default: BartaLazar@79648914/LLM-watermark-remover@1339776408
+    Description: GitHub OIDC subject prefix (owner@id/repo@id) of the only repo allowed to deploy.
   GitHubBranch:
     Type: String
     Default: main
