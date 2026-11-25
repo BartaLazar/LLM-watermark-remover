@@ -1,0 +1,11 @@
+# Allow-list: send Docker only what the image needs, so local files
+# (.venv, work_text_files, .claude, .git, ...) never end up in it.
+*
+!requirements.txt
+!pyproject.toml
+!README.md
+!LICENSE
+!synreplace/
+!web/
+**/__pycache__
+**/*.py[cod]
